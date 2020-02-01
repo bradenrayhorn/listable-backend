@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/listable.iml" filepath="$PROJECT_DIR$/.idea/listable.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../listable-backend/.idea/listable-backend.iml" filepath="$PROJECT_DIR$/../listable-backend/.idea/listable-backend.iml" />
     </modules>
   </component>
 </project>
