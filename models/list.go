@@ -1,10 +1,9 @@
 package models
 
-import "github.com/jinzhu/gorm"
-
 type List struct {
-  gorm.Model
+  AutoId
   Title string `json:"title"`
+  ModelTimestamps
 }
 
 func GetAllLists() []*List {

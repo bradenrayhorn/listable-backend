@@ -4,6 +4,7 @@ import (
   "fmt"
   "github.com/jinzhu/gorm"
   "github.com/spf13/viper"
+  "time"
 )
 
 var db *gorm.DB
@@ -30,4 +31,13 @@ func CloseDatabase() {
   if db != nil {
     db.Close()
   }
+}
+
+type AutoId struct {
+  ID uint `gorm:"primary_key" json:"id"`
+}
+
+type ModelTimestamps struct {
+  CreatedAt time.Time `json:"-"`
+  UpdatedAt time.Time `json:"-"`
 }

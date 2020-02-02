@@ -1,11 +1,11 @@
 package controllers
 
 import (
-  "encoding/json"
   "github.com/bradenrayhorn/listable-backend/models"
+  "github.com/bradenrayhorn/listable-backend/utils"
   "net/http"
 )
 
 func GetAllLists(w http.ResponseWriter, r *http.Request) {
-  json.NewEncoder(w).Encode(models.GetAllLists())
+  utils.JsonResponse(w, models.GetAllLists())
 }
