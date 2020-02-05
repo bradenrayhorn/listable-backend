@@ -1,9 +1,8 @@
 package main
 
 import (
-  "github.com/bradenrayhorn/listable-backend/models"
+  "github.com/bradenrayhorn/listable-backend/db"
   "github.com/gorilla/mux"
-  _ "github.com/jinzhu/gorm/dialects/mysql"
   "github.com/spf13/viper"
   "log"
   "net/http"
@@ -11,9 +10,9 @@ import (
 
 func handleRequests() {
   router := mux.NewRouter().StrictSlash(true)
-
+  
   registerRoutes(router)
-
+  
   log.Fatal(http.ListenAndServe(":"+viper.GetString("server_port"), router))
 }
 
@@ -21,7 +20,7 @@ func loadConfig() {
   viper.SetConfigName("config")
   viper.SetConfigType("yaml")
   viper.AddConfigPath(".")
-
+  
   if err := viper.ReadInConfig(); err != nil {
     panic("failed to read config")
   }
@@ -29,9 +28,9 @@ func loadConfig() {
 
 func main() {
   loadConfig()
-
-  models.SetupDatabase()
-  defer models.CloseDatabase()
-
+  
+  db.SetupDatabase()
+  defer db.CloseDatabase()
+  
   handleRequests()
 }

@@ -8,7 +8,6 @@ type List struct {
 
 func GetAllLists() []*List {
   lists := make([]*List, 0)
-  db.Find(&lists)
 
   return lists
 }
