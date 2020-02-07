@@ -20,7 +20,7 @@ func (token ApiToken) TableName() string {
 func (token *ApiToken) Generate() {
 	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	rand.Seed(time.Now().UTC().UnixNano())
-	
+
 	b := make([]rune, 64)
 	for i := range b {
 		b[i] = letter[rand.Intn(len(letter))]

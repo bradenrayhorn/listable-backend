@@ -8,8 +8,15 @@ import (
 )
 
 func GetAllLists(w http.ResponseWriter, r *http.Request) {
-	
+
 	user := context.Get(r, AuthUser).(models.User)
-	
-	utils.JsonResponse(w, "welcome "+user.Name)
+
+	lists, err := models.GetAllListsForUser(user.ID)
+
+	if err != nil {
+		utils.JsonError(err.Error(), w, http.StatusInternalServerError)
+		return
+	}
+
+	utils.JsonSuccess(lists, w)
 }
