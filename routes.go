@@ -6,15 +6,17 @@ import (
 )
 
 func registerRoutes(router *mux.Router) {
-
+  
   apiRouter := router.PathPrefix("/api").Subrouter()
-  authRouter := apiRouter.PathPrefix("/auth").Subrouter()
-
+  authRouter := router.PathPrefix("/api/auth").Subrouter()
+  
+  apiRouter.Use(controllers.AuthMiddleware)
+  
   // Authentication
   authRouter.HandleFunc("/register", controllers.Register).Methods("POST")
   authRouter.HandleFunc("/login", controllers.Login).Methods("POST")
-
+  
   // Lists
   apiRouter.HandleFunc("/lists", controllers.GetAllLists).Methods("GET")
-
+  
 }

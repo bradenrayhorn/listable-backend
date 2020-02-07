@@ -2,6 +2,7 @@ package db
 
 import (
   "fmt"
+  _ "github.com/go-sql-driver/mysql"
   "github.com/iancoleman/strcase"
   "github.com/jmoiron/sqlx"
   "github.com/spf13/viper"
@@ -81,7 +82,7 @@ func (db DB) Create(m interface{}) {
   if err != nil {
     fmt.Println(err) // TODO return error
   } else {
-    if id, err := r.LastInsertId(); err == nil && reflect.ValueOf(m).Elem().FieldByName("ID").IsValid() {
+    if id, err := r.LastInsertId(); err == nil && reflect.ValueOf(m).Elem().FieldByName("Id").IsValid() {
       reflect.ValueOf(m).Elem().FieldByName("Id").SetUint(uint64(id))
     }
   }
