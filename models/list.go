@@ -2,13 +2,14 @@ package models
 
 import (
 	"github.com/bradenrayhorn/listable-backend/db"
-	"github.com/bradenrayhorn/listable-backend/db/listable/model"
 	. "github.com/bradenrayhorn/listable-backend/db/listable/table"
 	"github.com/go-jet/jet/mysql"
 )
 
 type List struct {
-	model.Lists
+	ID      uint32 `sql:"primary_key" json:"id" alias:"lists.id"`
+	GroupID uint32 `json:"-" alias:"lists.group_id"`
+	Name    string `json:"name" alias:"lists.name"`
 }
 
 func GetAllListsForUser(userId uint32) ([]List, error) {
