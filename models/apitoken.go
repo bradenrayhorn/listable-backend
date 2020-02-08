@@ -2,19 +2,16 @@ package models
 
 import (
 	"github.com/bradenrayhorn/listable-backend/db"
+	"github.com/bradenrayhorn/listable-backend/db/listable/model"
+	. "github.com/bradenrayhorn/listable-backend/db/listable/table"
 	"github.com/bradenrayhorn/listable-backend/utils"
+	"github.com/go-jet/jet/mysql"
 	"math/rand"
 	"time"
 )
 
 type ApiToken struct {
-	UserID uint
-	Token  string
-	ModelTimestamps
-}
-
-func (token ApiToken) TableName() string {
-	return "api_tokens"
+	model.APITokens
 }
 
 func (token *ApiToken) Generate() {
@@ -28,16 +25,21 @@ func (token *ApiToken) Generate() {
 	token.Token = string(b)
 }
 
+func (token ApiToken) Create() error {
+	_, err := APITokens.INSERT(APITokens.UserID, APITokens.Token).MODEL(token).Exec(db.GetDB().DB)
+	return err
+}
+
 func FindTokenUser(token string) (User, error) {
-	user := User{}
-	count := 0
-	err := db.GetDB().DB.Get(&count, "SELECT count(*) FROM api_tokens WHERE token = ?", token)
+	var users []User
+	err := Users.SELECT(Users.AllColumns).FROM(Users.
+		INNER_JOIN(APITokens, APITokens.UserID.EQ(Users.ID))).
+		WHERE(APITokens.Token.EQ(mysql.String(token))).Query(db.GetDB().DB, &users)
 	if err != nil {
-		return user, err
+		return User{}, err
 	}
-	if count < 1 {
-		return user, utils.ApiError{Code: 401, Reason: "invalid token"}
+	if len(users) != 1 {
+		return User{}, utils.ApiError{Code: 401, Reason: "invalid token"}
 	}
-	err = db.GetDB().DB.Get(&user, "SELECT users.* FROM users join api_tokens on users.id = api_tokens.user_id WHERE token = ?", token)
-	return user, err
+	return users[0], err
 }

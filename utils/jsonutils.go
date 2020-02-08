@@ -20,6 +20,12 @@ func JsonError(message string, w http.ResponseWriter, code int) {
 	JsonResponse(w, map[string]string{"error": message})
 }
 
+func JsonApiError(apiError ApiError, w http.ResponseWriter) {
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(apiError.Code)
+	JsonResponse(w, map[string]string{"error": apiError.Error()})
+}
+
 func JsonSuccess(v interface{}, w http.ResponseWriter) {
 	w.Header().Set("content-type", "application/json")
 	JsonResponse(w, map[string]interface{}{"data": v})

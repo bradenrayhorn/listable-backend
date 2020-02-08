@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/bradenrayhorn/listable-backend/db"
 	"github.com/bradenrayhorn/listable-backend/models"
 	"github.com/bradenrayhorn/listable-backend/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -27,10 +26,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := models.User{
-		Name:     values.Username,
-		Password: string(hashedPassword),
+	user := models.User{}
+	user.Name = values.Username
+	user.Password = string(hashedPassword)
+
+	if err = user.Create(); utils.CheckInternalError(w, err) {
+		return
 	}
-	db.GetDB().Create(&user)
-	user.MakeApiToken()
+	_, err = user.MakeApiToken()
+	utils.CheckInternalError(w, err)
 }

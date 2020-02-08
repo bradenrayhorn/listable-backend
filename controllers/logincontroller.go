@@ -32,7 +32,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if success != nil {
 		utils.JsonError("invalid username / password", w, 401)
 	} else {
-		token := user.MakeApiToken()
-		utils.JsonSuccess(map[string]string{"token": token}, w)
+		token, err := user.MakeApiToken()
+		if !utils.CheckInternalError(w, err) {
+			utils.JsonSuccess(map[string]string{"token": token}, w)
+		}
 	}
 }
