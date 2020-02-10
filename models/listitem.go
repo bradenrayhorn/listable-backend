@@ -15,11 +15,29 @@ func AddListItem(listId int, content string) error {
 	return err
 }
 
-func SetListItemChecked(listId int, checked bool) error {
+func SetListItemChecked(listItemId int, checked bool) error {
 	_, err := ListItems.
 		UPDATE(ListItems.Checked).
 		SET(checked).
-		WHERE(ListItems.ID.EQ(mysql.Int(int64(listId)))).
+		WHERE(ListItems.ID.EQ(mysql.Int(int64(listItemId)))).
+		Exec(db.GetDB().DB)
+
+	return err
+}
+
+func RemoveListItem(listItemId int) error {
+	_, err := ListItems.
+		DELETE().
+		WHERE(ListItems.ID.EQ(mysql.Int(int64(listItemId)))).
+		Exec(db.GetDB().DB)
+
+	return err
+}
+
+func RemoveListItemsForList(listId int) error {
+	_, err := ListItems.
+		DELETE().
+		WHERE(ListItems.ID.IN(ListItems.INNER_JOIN(Lists, Lists.ID.EQ(ListItems.ListID)).SELECT(ListItems.ID).WHERE(Lists.ID.EQ(mysql.Int(int64(listId)))))).
 		Exec(db.GetDB().DB)
 
 	return err
