@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/bradenrayhorn/listable-backend/db"
 	"github.com/iancoleman/strcase"
 	"net/http"
@@ -71,8 +73,17 @@ func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) 
 	t := reflect.TypeOf(rules)
 	err := r.ParseForm()
 	if err != nil {
-		// TODO better error handling and parse JSON bodies
+		// TODO better error handling
 		panic("Failed to parse form")
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var body map[string]interface{}
+	if decoder.More() {
+		err = decoder.Decode(&body)
+		if err != nil {
+			return nil, &ApiError{http.StatusBadRequest, "invalid json body", nil}
+		}
 	}
 
 	resultStruct := reflect.New(t)
@@ -94,7 +105,12 @@ func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) 
 			}
 			validator, found := validationRules[rule]
 			if found {
-				bodyValue := r.Form.Get(jsonName)
+				var bodyValue string // TODO allow body value to be any type
+				if body[jsonName] != nil {
+					bodyValue = fmt.Sprintf("%v", body[jsonName])
+				} else {
+					bodyValue = r.Form.Get(jsonName)
+				}
 				apiError := validator.(func(string, string, string) ApiError)(bodyValue, jsonName, ruleValue)
 				if apiError.error != nil {
 					return nil, &apiError
