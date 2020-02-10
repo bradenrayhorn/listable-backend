@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  go:
+    build:
+      context: ./
+    container_name: listable-backend-go
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./config.yml:/go/src/app/config.yml
+    ports:
+      - 32774:8080
