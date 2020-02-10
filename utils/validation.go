@@ -5,6 +5,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -37,9 +38,21 @@ func validateUnique(value string, field string, ruleValue string) ApiError {
 	}
 }
 
+func validateInteger(value string, field string, ruleValue string) ApiError {
+	if _, err := strconv.Atoi(value); err == nil {
+		return ApiError{Code: 200}
+	} else {
+		return ApiError{
+			Code:   422,
+			Reason: field + " must be an integer.",
+		}
+	}
+}
+
 var validationRules = map[string]interface{}{
 	"required": validateRequired,
 	"unique":   validateUnique,
+	"integer":  validateInteger,
 }
 
 func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) (interface{}, *ApiError) {
@@ -77,7 +90,13 @@ func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) 
 				if apiError.Code != 200 {
 					return nil, &apiError
 				}
-				resultStruct.Elem().Field(i).SetString(bodyValue)
+				switch resultStruct.Elem().Field(i).Type().String() {
+				case "int":
+					value, _ := strconv.Atoi(bodyValue)
+					resultStruct.Elem().Field(i).SetInt(int64(value))
+				default:
+					resultStruct.Elem().Field(i).SetString(bodyValue)
+				}
 			}
 		}
 	}

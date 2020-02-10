@@ -19,6 +19,9 @@ func registerRoutes(router *mux.Router) {
 	// Lists
 	apiRouter.HandleFunc("/lists", controllers.GetAllLists).Methods("GET")
 
+	// List Items
+	apiRouter.HandleFunc("/list-items", controllers.AddListItem).Methods("POST")
+
 	// Groups
 	apiRouter.HandleFunc("/groups", controllers.GetAllGroups).Methods("GET")
 	apiRouter.HandleFunc("/groups", controllers.CreateGroup).Methods("POST")
