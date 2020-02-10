@@ -49,10 +49,22 @@ func validateInteger(value string, field string, ruleValue string) ApiError {
 	}
 }
 
+func validateBoolean(value string, field string, ruleValue string) ApiError {
+	if _, err := strconv.ParseBool(value); err == nil {
+		return ApiError{Code: 200}
+	} else {
+		return ApiError{
+			Code:   422,
+			Reason: field + " must be a boolean.",
+		}
+	}
+}
+
 var validationRules = map[string]interface{}{
 	"required": validateRequired,
 	"unique":   validateUnique,
 	"integer":  validateInteger,
+	"boolean":  validateBoolean,
 }
 
 func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) (interface{}, *ApiError) {
@@ -83,7 +95,7 @@ func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) 
 			validator, found := validationRules[rule]
 			if found {
 				bodyValue := r.Form.Get(jsonName)
-				apiError := validator.(func(string, string, string) ApiError)(bodyValue, field.Name, ruleValue)
+				apiError := validator.(func(string, string, string) ApiError)(bodyValue, jsonName, ruleValue)
 				if apiError.error != nil {
 					return nil, &apiError
 				}
@@ -94,6 +106,9 @@ func ValidateRequest(rules interface{}, r *http.Request, w http.ResponseWriter) 
 				case "int":
 					value, _ := strconv.Atoi(bodyValue)
 					resultStruct.Elem().Field(i).SetInt(int64(value))
+				case "bool":
+					value, _ := strconv.ParseBool(bodyValue)
+					resultStruct.Elem().Field(i).SetBool(value)
 				default:
 					resultStruct.Elem().Field(i).SetString(bodyValue)
 				}
