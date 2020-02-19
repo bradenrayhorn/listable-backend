@@ -8,4 +8,6 @@ RUN go install -v ./...
 
 RUN go build
 
+EXPOSE 80
+
 CMD ["./listable-backend"]

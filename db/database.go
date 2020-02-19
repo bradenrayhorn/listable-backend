@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
+	"log"
 	"time"
 )
 
@@ -19,15 +20,22 @@ type HasTableName interface {
 var db *DB
 
 func SetupDatabase() {
-	dbCon, err := sqlx.Open("mysql", fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	conString := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		viper.GetString("mysql_username"),
 		viper.GetString("mysql_password"),
 		viper.GetString("mysql_host"),
 		viper.GetString("mysql_port"),
 		viper.GetString("mysql_database"),
-	))
-	if err != nil || dbCon.Ping() != nil {
-		panic("failed to connect to database")
+	)
+	dbCon, err := sqlx.Open("mysql", conString)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if err = dbCon.Ping(); err != nil {
+		log.Println("failed to connect to database")
+		log.Println(err)
+		return
 	}
 	dbCon.SetConnMaxLifetime(time.Second)
 	db = &DB{DB: dbCon}

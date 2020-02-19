@@ -13,7 +13,14 @@ func handleRequests() {
 
 	registerRoutes(router)
 
-	log.Fatal(http.ListenAndServe(":"+viper.GetString("server_port"), router))
+	port := viper.GetString("server_port")
+
+	if len(port) == 0 {
+		port = "80"
+	}
+
+	log.Printf("listening on port %s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
 
 func loadConfig() {
@@ -22,8 +29,14 @@ func loadConfig() {
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
-		panic("failed to read config")
+		log.Println(err.Error())
 	}
+
+	_ = viper.BindEnv("mysql_username", "MYSQL_USERNAME")
+	_ = viper.BindEnv("mysql_host", "MYSQL_HOST")
+	_ = viper.BindEnv("mysql_password", "MYSQL_PASSWORD")
+	_ = viper.BindEnv("mysql_port", "MYSQL_PORT")
+	_ = viper.BindEnv("mysql_database", "MYSQL_DATABASE")
 }
 
 func main() {
